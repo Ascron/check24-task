@@ -15,5 +15,8 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "vlucas/phpdotenv": "5.4.x-dev",
+        "ext-pdo": "*"
+    }
 }

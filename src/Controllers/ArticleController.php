@@ -4,12 +4,15 @@ namespace Ascron\Check24Task\Controllers;
 
 class ArticleController
 {
-    public function actionArticle()
+    /**
+     * @return void
+     */
+    public function getShow()
     {
 
     }
 
-    public function actionArticleList()
+    public function getList()
     {
 
     }

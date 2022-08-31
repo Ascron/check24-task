@@ -4,12 +4,12 @@ namespace Ascron\Check24Task\Controllers;
 
 class AuthController
 {
-    public function actionLogin()
+    public function postLogin()
     {
 
     }
 
-    public function actionLogout()
+    public function getLogout()
     {
 
     }

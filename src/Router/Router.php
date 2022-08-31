@@ -6,21 +6,33 @@ use Ascron\Check24Task\Exceptions\NotFoundException;
 
 class Router
 {
-    private string $requestUri;
-
-    public function __construct(string $requestUri)
-    {
-        $this->requestUri = $requestUri;
-    }
+    public function __construct(
+        private string $requestUri,
+        private string $requestMethod
+    ) {}
 
     public function findRoute(): callable
+    {
+        [$controller, $action, $parameters] = $this->parseUri();
+
+        $resolver = new ControllerResolver($controller, $action, $this->requestMethod);
+        if ($resolver->resolve() === false) {
+            throw new NotFoundException();
+        }
+
+        return $resolver->getCallable();
+    }
+
+    protected function parseUri(): array
     {
         $requestParts = explode('/', $this->requestUri);
         $controller = $requestParts[1] ?? null;
         $action = $requestParts[2] ?? null;
 
-        if ($controller === null || $action === null) {
-            throw new NotFoundException();
+        if (count($requestParts)) {
+            $parameters = array_slice($requestParts, 3);
         }
+
+        return [$controller, $action, $parameters];
     }
 }
