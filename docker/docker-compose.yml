@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  php-fpm:
+    build:
+      context: ./php
+    image: php-check24
+    restart: always
+    volumes:
+      - ../:/var/www
+  nginx:
+    build:
+      context: ./nginx
+    image: nginx-check24
+    ports:
+      - 80:80
+    volumes:
+      - ../public:/var/www/public
+    restart: always
+  mysql:
+    image: mysql:8
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}

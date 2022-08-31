@@ -1,0 +1,19 @@
+{
+    "name": "ascron/check24-task",
+    "description": "Test assigment for Check24",
+    "type": "project",
+    "license": "GPL-3.0-only",
+    "autoload": {
+        "psr-4": {
+            "Ascron\\Check24Task\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Konstantin Klimovich",
+            "email": "ascronz@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
