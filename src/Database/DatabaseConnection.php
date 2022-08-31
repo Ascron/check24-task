@@ -19,5 +19,18 @@ class DatabaseConnection
         $this->adapter->insertIntoTable($table, $data);
     }
 
+    public function updateTable(string $table, array $data, array $where = []): int
+    {
+        return $this->adapter->updateTable($table, $data, $where);
+    }
 
+    public function deleteFromTable(string $table, array $where = []): int
+    {
+        return $this->adapter->deleteFromTable($table, $where);
+    }
+
+    public function getRowCount(string $table): int
+    {
+        return $this->adapter->getRowCount($table);
+    }
 }

@@ -3,6 +3,7 @@
 namespace Ascron\Check24Task;
 
 use Ascron\Check24Task\Exceptions\HttpException;
+use Ascron\Check24Task\Router\CallObject;
 use Ascron\Check24Task\Router\Router;
 use Ascron\Check24Task\View\View;
 
@@ -14,11 +15,11 @@ class App
     )
     {}
 
-    public function run(): string
+    public function run(): void
     {
         try {
-            $callable = $this->routeRequest();
-            $response = $this->callAction($callable);
+            $callObject = $this->routeRequest();
+            $response = $this->callAction($callObject);
         } catch (HttpException $exception) {
             $response = $this->createErrorResponse($exception);
         }
@@ -26,13 +27,15 @@ class App
         $this->displayResponse($response);
     }
 
-    private function routeRequest(): callable
+    private function routeRequest(): CallObject
     {
         return $this->router->findRoute();
     }
 
-    private function callAction(): string
+    private function callAction(CallObject $callObject): string
     {
+        call_user_func_array([$callObject->getController(), 'beforeAction'], [$this]);
+        return call_user_func_array($callObject->getCallable(), [$callObject->getParameters(), $callObject->getFormData()]);
     }
 
     private function createErrorResponse(\Exception $exception): string

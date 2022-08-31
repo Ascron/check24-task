@@ -20,5 +20,5 @@ interface DatabaseAdapter
 
     public function deleteFromTable(string $table, array $where = []): int;
 
-    public function getRowCount(string $table);
+    public function getRowCount(string $table): int;
 }

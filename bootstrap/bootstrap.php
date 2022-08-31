@@ -2,7 +2,7 @@
 
 const APP_DIR = __DIR__ . '/../';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv = Dotenv\Dotenv::createImmutable(APP_DIR);
 $dotenv->load();
 
 $app = new \Ascron\Check24Task\App(

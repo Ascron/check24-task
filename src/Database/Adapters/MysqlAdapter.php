@@ -4,6 +4,7 @@ namespace Ascron\Check24Task\Database\Adapters;
 
 use Ascron\Check24Task\Database\DatabaseAdapter;
 use Ascron\Check24Task\Database\DatabaseConnection;
+use Ascron\Check24Task\Exceptions\Database\DatabaseException;
 
 class MysqlAdapter implements DatabaseAdapter
 {
@@ -35,8 +36,9 @@ class MysqlAdapter implements DatabaseAdapter
         $bindings = $this->buildSelectBindings($table, $where, $orderBy, $limit, $offset);
 
         $statement = $this->pdo->prepare($query);
-        $statement->execute($bindings);
-        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $this->executeStatement($statement, $bindings);
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        return $result;
     }
 
     private function buildSelectQuery(array $where = [], array $orderBy = [], int $limit = 0, int $offset = 0): string
@@ -75,10 +77,7 @@ class MysqlAdapter implements DatabaseAdapter
             }
         }
         if (!empty($orderBy)) {
-            foreach ($bindings as $key => $value) {
-                $bindings[] = $key;
-                $bindings[] = $value;
-            }
+            $bindings = array_merge($bindings, $orderBy);
         }
         if ($limit > 0) {
             $bindings[] = $limit;
@@ -95,7 +94,7 @@ class MysqlAdapter implements DatabaseAdapter
         $bindings = $this->buildInsertBindings($table, $data);
 
         $statement = $this->pdo->prepare($query);
-        return $statement->execute($bindings);
+        return $this->executeStatement($statement, $bindings);
     }
 
     private function buildInsertQuery(array $data): string
@@ -115,7 +114,7 @@ class MysqlAdapter implements DatabaseAdapter
         $bindings = $this->buildUpdateBindings($table, $data, $where);
 
         $statement = $this->pdo->prepare($query);
-        $statement->execute($bindings);
+        $this->executeStatement($statement, $bindings);
         return $statement->rowCount();
     }
 
@@ -128,13 +127,19 @@ class MysqlAdapter implements DatabaseAdapter
 
     private function buildUpdateBindings(string $table, array $data, array $where): array
     {
-        $flatData = [];
+        $bindings = [$table];
+
         foreach ($data as $key => $value) {
-            $flatData[] = $key;
-            $flatData[] = $value;
+            $bindings[] = $key;
+            $bindings[] = $value;
         }
 
-        return array_merge([$table], $flatData, $where);
+        foreach ($where as $key => $value) {
+            $bindings[] = $key;
+            $bindings[] = $value;
+        }
+
+        return $bindings;
     }
 
     public function deleteFromTable(string $table, array $where = []): int
@@ -143,7 +148,7 @@ class MysqlAdapter implements DatabaseAdapter
         $bindings = $this->buildDeleteBindings($table, $where);
 
         $statement = $this->pdo->prepare($query);
-        $statement->execute($bindings);
+        $this->executeStatement($statement, $bindings);
         return $statement->rowCount();
     }
 
@@ -155,14 +160,27 @@ class MysqlAdapter implements DatabaseAdapter
 
     private function buildDeleteBindings(string $table, array $where): array
     {
-        return array_merge([$table], $where);
+        $bindings = [$table];
+        foreach ($where as $key => $value) {
+            $bindings[] = $key;
+            $bindings[] = $value;
+        }
+        return $bindings;
     }
 
     public function getRowCount(string $table): int
     {
         $statement = $this->pdo->prepare("SELECT COUNT(*) as `count` FROM `?`");
-        $statement->execute([$table]);
+        $this->executeStatement($statement, [$table]);
         return (int)$statement->fetchColumn();
     }
 
+    private function executeStatement(\PDOStatement $statement, array $bindings): bool
+    {
+        try {
+            return $statement->execute($bindings);
+        } catch (\PDOException $exception) {
+            throw new DatabaseException($exception->getMessage(), $exception->getCode());
+        }
+    }
 }
