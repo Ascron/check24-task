@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Ascron\Check24Task\Repository;
 
@@ -7,7 +7,7 @@ use Ascron\Check24Task\Database\DatabaseConnection;
 class ArticleRepository implements RepositoryInterface
 {
     private DatabaseConnection $connection;
-    private $tableName = 'article';
+    private string $tableName = 'article';
 
     public function __construct(DatabaseConnection $connection)
     {
@@ -16,7 +16,7 @@ class ArticleRepository implements RepositoryInterface
 
     public function getList(int $limit, int $offset): array
     {
-        return $this->connection->selectFromTable($this->tableName, [], ['id DESC'], $limit, $offset);
+        return $this->connection->selectFromTable($this->tableName, [], [], $limit, $offset);
     }
 
     public function createArticle(string $imageUrl, string $title, int $author, string $text): void

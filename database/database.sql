@@ -21,6 +21,11 @@ create table user
     password varchar(255) not null
 );
 
+insert into check24.article (id, created_at, image_url, title, author_id, text) values (1, '2022-08-31 15:22:44', 'https://via.placeholder.com/350x150', 'Title 1', 1, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.');
+insert into check24.user (id, username, password) values (1, 'Ascron', 'test_hashe');
+
+
+
 create table comment
 (
     id           int unsigned auto_increment

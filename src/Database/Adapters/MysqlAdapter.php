@@ -38,32 +38,53 @@ class MysqlAdapter implements DatabaseAdapter
     public function selectFromTable(string $table, array $where = [], array $orderBy = [], int $limit = 0, int $offset = 0): array
     {
         $query = $this->buildSelectQuery($where, $orderBy, $limit, $offset);
-        $bindings = $this->buildSelectBindings($table, $where, $orderBy, $limit, $offset);
-
         $statement = $this->pdo->prepare($query);
-        $this->executeStatement($statement, $bindings);
+        $this->bindSelectValues($statement, $table, $where, $orderBy, $limit, $offset);
+
+        $this->executeStatement($statement);
         $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
         return $result;
     }
 
     private function buildSelectQuery(array $where = [], array $orderBy = [], int $limit = 0, int $offset = 0): string
     {
-        $query = "SELECT * FROM `?`";
-        if (!empty($where)) {
-            $wherePlaceholders = array_fill(0, count($where), '? = ?');
+        $query = "SELECT * FROM :table";
+        if ($where !== []) {
+            $wherePlaceholders = [];
+            foreach ($where as $key => $value) {
+                $wherePlaceholders[] = "{$key} = :{$key}";
+            }
             $query .= " WHERE " . implode(' AND ', $wherePlaceholders);
         }
-        if (!empty($orderBy)) {
-            $orderByPlaceholders = array_fill(0, count($orderBy), '?');
-            $query .= " ORDER BY " . implode(', ', $orderByPlaceholders);
+        if ($orderBy !== []) {
+            $query .= " ORDER BY :orderBy";
         }
         if ($limit > 0) {
-            $query .= " LIMIT ?";
+            $query .= " LIMIT :limit";
         }
         if ($offset > 0) {
-            $query .= " OFFSET ?";
+            $query .= " OFFSET :offset";
         }
         return $query;
+    }
+
+    private function bindSelectValues(\PDOStatement $statement, string $table, array $where, array $orderBy, int $limit, int $offset): void
+    {
+        $statement->bindValue(':table', $table);
+        if ($where !== []) {
+            foreach ($where as $key => $value) {
+                $statement->bindValue(":{$key}", $value);
+            }
+        }
+        if ($orderBy !== []) {
+            $statement->bindValue(':orderBy', implode(',', $orderBy));
+        }
+        if ($limit > 0) {
+            $statement->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        }
+        if ($offset > 0) {
+            $statement->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        }
     }
 
     private function buildSelectBindings(
@@ -75,13 +96,13 @@ class MysqlAdapter implements DatabaseAdapter
     ): array
     {
         $bindings = [$table];
-        if (!empty($where)) {
+        if ($where !== []) {
             foreach ($where as $key => $value) {
                 $bindings[] = $key;
                 $bindings[] = $value;
             }
         }
-        if (!empty($orderBy)) {
+        if ($orderBy !== []) {
             $bindings = array_merge($bindings, $orderBy);
         }
         if ($limit > 0) {
@@ -180,7 +201,7 @@ class MysqlAdapter implements DatabaseAdapter
         return (int)$statement->fetchColumn();
     }
 
-    private function executeStatement(\PDOStatement $statement, array $bindings): bool
+    private function executeStatement(\PDOStatement $statement, ?array $bindings = null): bool
     {
         try {
             return $statement->execute($bindings);
