@@ -32,9 +32,9 @@ class ArticleController extends AbstractController
      * Show all articles with pagination
      *
      * @param array $parameters
-     * @return void
+     * @return string
      */
-    public function getList(array $parameters = [])
+    public function getList(array $parameters = []): string
     {
         $page = 0;
         if ($parameters !== []) {
@@ -48,8 +48,8 @@ class ArticleController extends AbstractController
 
         $articlesPerPage = (int)$_ENV['ARTICLES_PER_PAGE'];
 
-        $articles = $this->articleRepository->getList($articlesPerPage, $page * $articlesPerPage);
-        $this->app->getView()->render('article_list', ['articles' => $articles]);
+        $articles = $this->articleRepository->getList($articlesPerPage, ($page - 1) * $articlesPerPage);
+        return $this->app->getView()->render('article_list', ['articles' => $articles]);
     }
 
     /**

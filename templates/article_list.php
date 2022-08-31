@@ -1,4 +1,4 @@
-<?php include './header.php' ?>
+<?php include __DIR__ . '/header.php' ?>
 <?php foreach ($articles as $article): ?>
 <div>
     <div><?=$article['created_at']?> - <?=$article['title']?></div>
@@ -9,4 +9,4 @@
     <div>Author: <?=$article['author_id']?> Kommentare: 0</div>
 </div>
 <?php endforeach; ?>
-<?php include './footer.php' ?>
+<?php include __DIR__ . '/footer.php' ?>

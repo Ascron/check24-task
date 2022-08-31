@@ -37,18 +37,18 @@ class MysqlAdapter implements DatabaseAdapter
 
     public function selectFromTable(string $table, array $where = [], array $orderBy = [], int $limit = 0, int $offset = 0): array
     {
-        $query = $this->buildSelectQuery($where, $orderBy, $limit, $offset);
+        $query = $this->buildSelectQuery($table, $where, $orderBy, $limit, $offset);
         $statement = $this->pdo->prepare($query);
-        $this->bindSelectValues($statement, $table, $where, $orderBy, $limit, $offset);
+        $this->bindSelectValues($statement, $where, $orderBy, $limit, $offset);
 
         $this->executeStatement($statement);
         $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
         return $result;
     }
 
-    private function buildSelectQuery(array $where = [], array $orderBy = [], int $limit = 0, int $offset = 0): string
+    private function buildSelectQuery(string $table, array $where = [], array $orderBy = [], int $limit = 0, int $offset = 0): string
     {
-        $query = "SELECT * FROM :table";
+        $query = "SELECT * FROM `{$table}`";
         if ($where !== []) {
             $wherePlaceholders = [];
             foreach ($where as $key => $value) {
@@ -68,9 +68,8 @@ class MysqlAdapter implements DatabaseAdapter
         return $query;
     }
 
-    private function bindSelectValues(\PDOStatement $statement, string $table, array $where, array $orderBy, int $limit, int $offset): void
+    private function bindSelectValues(\PDOStatement $statement, array $where, array $orderBy, int $limit, int $offset): void
     {
-        $statement->bindValue(':table', $table);
         if ($where !== []) {
             foreach ($where as $key => $value) {
                 $statement->bindValue(":{$key}", $value);
