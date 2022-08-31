@@ -45,6 +45,6 @@ class CallObject
 
     public function getCallable(): callable
     {
-        return [$this->controller, $this->action];
+        return [$this->getController(), $this->getAction()];
     }
 }

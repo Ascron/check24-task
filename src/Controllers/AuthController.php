@@ -4,11 +4,21 @@ namespace Ascron\Check24Task\Controllers;
 
 class AuthController
 {
-    public function postLogin()
+    /**
+     * Handles POST requests to /auth/login
+     *
+     * @return void
+     */
+    public function postLogin($parameters = [], $formData = [])
     {
 
     }
 
+    /**
+     * Handles GET requests to /auth/logout
+     *
+     * @return void
+     */
     public function getLogout()
     {
 

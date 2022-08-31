@@ -2,15 +2,20 @@
 
 namespace Ascron\Check24Task\Router;
 
-use Ascron\Check24Task\Controllers\ControllerInterface;
-use Ascron\Check24Task\Exceptions\NotFoundException;
+use Ascron\Check24Task\Exceptions\Http\NotFoundException;
 
+/**
+ * Class Router
+ *
+ * Handles routing of requests to controllers.
+ */
 class Router
 {
+    /**
+     * Default controller, if / is requested.
+     * @var string[]
+     */
     private $defaultRoute = ['article', 'list'];
-
-    private ControllerInterface $controller;
-    private string $action;
 
     public function __construct(
         private string $requestUri,
@@ -30,9 +35,7 @@ class Router
             throw new NotFoundException();
         }
 
-        [$controller, $action] = $resolver->getCallable();
-
-        return new CallObject($controller, $action, $parameters, $_POST);
+        return new CallObject($resolver->getController(), $resolver->getAction(), $parameters, $_POST);
     }
 
     protected function parseUri(): array

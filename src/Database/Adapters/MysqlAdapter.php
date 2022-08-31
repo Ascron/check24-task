@@ -10,6 +10,11 @@ class MysqlAdapter implements DatabaseAdapter
 {
     private \PDO $pdo;
 
+    public function __construct()
+    {
+        $this->connect();
+    }
+
     public function connect(): void
     {
         $this->pdo = new \PDO(
@@ -180,7 +185,7 @@ class MysqlAdapter implements DatabaseAdapter
         try {
             return $statement->execute($bindings);
         } catch (\PDOException $exception) {
-            throw new DatabaseException($exception->getMessage(), $exception->getCode());
+            throw new DatabaseException($exception->getMessage(), (int)$exception->getCode());
         }
     }
 }
